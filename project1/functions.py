@@ -3,23 +3,24 @@ import numpy as np
 
 # вычисление значения функции
 def calculateFunction(x):
-    if 2 <= x <= 3:
+    if 2 < x <= 3:
         return((np.NaN, np.NaN))
     else:
-        upper = m.sqrt(x*x-5*x+6)
-        lower = x - 3
-        result = upper*upper / lower
-    return((x,result))
+        y = x - 2
+    return((x,y))
 
 # вычисление всех значений функции на заданном интервале
-def countPoints(start,end):
+def countPoints(start,end,step=0.1):
     listOfX = []
     listOfY = []
     while start <= end:
         tmp = calculateFunction(start)
         listOfX.append(tmp[0])
         listOfY.append(tmp[1])
-        start += 0.1
+        start += step
+    #for i in range(0, len(listOfX) - 1):
+    #    print(listOfX[i],listOfY[i])
+    # код для проверки значений, так как в результате вычисления могут быть ошибки.
     return((listOfX,listOfY))
 
 # функция для проверки, что строка преобразуется в число
