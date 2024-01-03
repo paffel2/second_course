@@ -22,17 +22,17 @@ class KineticConst(object):
         return self._r
     
     def countKineticParameters(self):
-        s1 = self.numOfValues
+        s1 = self.numOfValues - 1
         s2, s3, s4, s5, s6 = 0, 0, 0, 0, 0
-        for i in range(1,self.numOfValues):
-            y = (log(fabs(self.ca[i-1] - self.ca[i]))) / (log(self.t[i]-self.t[i-1]))
-            x = log(self.t[i])
+        for i in range(s1):
+            y = log(fabs(self.ca[i+1] - self.ca[i]) / (self.t[i+1]-self.t[i]))
+            x = log(self.ca[i])
             s2 += x
             s3 += y
             s4 += x*x
             s5 += x*y
             s6 += y*y
-        print(s1,s2, s3, s4, s5, s6)
+        print(s1,s2,s3,s4,s5,s6)
         self._k = exp((s3*s4 - s2*s5)/(s1*s4 - s2*s2))
         self._n = (s1*s5 - s2*s3)/(s1*s4 - s2*s2)
         self._r = (s1*s5 - s2*s3)/sqrt((s1*s4 - s2*s2)*(s1*s6 - s3*s3))
@@ -51,15 +51,15 @@ class Dispertion(object):
         ca = self.ca
         cbValues = []
         cb = 0
-        for i in range(1, self.numOfValues):
-            t = self.t[i] - self.t[i-1] 
-            cb = cb + self.k*pow(ca,self.n)*t
+        for i in range(self.numOfValues-1):
+            t = self.t[i+1] - self.t[i] 
+            cb = cb + self.k * 2 * (pow(ca,self.n)) * t
             cbValues.append(cb)
-            ca = ca - self.k*pow(ca,self.n)*t
+            ca = ca - self.k * 2 * (pow(ca,self.n)) * t
             print("Значениея cb ", cb, "ca ", ca)
         return cbValues
 
-# TO DO
+
     def countCcValues(self):
         ca = self.ca
         ccValues = []

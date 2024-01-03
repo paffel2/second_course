@@ -115,6 +115,31 @@ class Ui_MainWindow(object):
         self.resetButton.clicked.connect(self.resetAction)
         self.countButton.clicked.connect(self.countAction)
 
+        self.dotsTable.setRowCount(8)
+        self.dotsTable.setColumnCount(2)
+        self.numOfDotsSpinBox.setValue(8)
+        self.concSubstanceBLineEdit.setText('0.8')
+        self.concSubstanceCLineEdit.setText('1.5')
+
+        self.dotsTable.setItem(0,0, QtWidgets.QTableWidgetItem('2.2'))
+        self.dotsTable.setItem(1, 0, QtWidgets.QTableWidgetItem("1.7"))
+        self.dotsTable.setItem(2, 0, QtWidgets.QTableWidgetItem("1.5"))
+        self.dotsTable.setItem(3, 0, QtWidgets.QTableWidgetItem("1.2"))
+        self.dotsTable.setItem(4, 0, QtWidgets.QTableWidgetItem("1.1"))
+        self.dotsTable.setItem(5, 0, QtWidgets.QTableWidgetItem("1.0"))
+        self.dotsTable.setItem(6, 0, QtWidgets.QTableWidgetItem("0.9"))
+        self.dotsTable.setItem(7, 0, QtWidgets.QTableWidgetItem("0.8"))
+
+        self.dotsTable.setItem(0, 1, QtWidgets.QTableWidgetItem("0"))
+        self.dotsTable.setItem(1, 1, QtWidgets.QTableWidgetItem("1.7"))
+        self.dotsTable.setItem(2, 1, QtWidgets.QTableWidgetItem("2.5"))
+        self.dotsTable.setItem(3, 1, QtWidgets.QTableWidgetItem("3.4"))
+        self.dotsTable.setItem(4, 1, QtWidgets.QTableWidgetItem("4"))
+        self.dotsTable.setItem(5, 1, QtWidgets.QTableWidgetItem("4.6"))
+        self.dotsTable.setItem(6, 1, QtWidgets.QTableWidgetItem("5.2"))
+        self.dotsTable.setItem(7, 1, QtWidgets.QTableWidgetItem("6"))
+        
+
         
 
         MainWindow.setCentralWidget(self.centralwidget)
@@ -156,12 +181,10 @@ class Ui_MainWindow(object):
             msg_box.exec()
     
     def countAction(self):
-        #self.cc = 0
         try:
             self.readConCb()
             self.readConCc()
             self.readListRange()
-           # self.readTable()
 
 
             self.tList = []
@@ -174,11 +197,9 @@ class Ui_MainWindow(object):
                 self.tList.append(tTempValue)
                 self.cList.append(cTempValue)
 
-            #print(self.n)
-            #print(self.cc)
-            #print(self.cb)
 
-            print(self.tList)
+            print(f'listOfT = {self.tList}')
+            print(f'listOfC = {self.cList}')
             checkTimeList(self.tList)
             checkConcList(self.cList)
             
@@ -187,62 +208,49 @@ class Ui_MainWindow(object):
             countKinetic.countKineticParameters()
 
             print("Кинетические параметры")
-            print(countKinetic.getK())
-            print(countKinetic.getR())
-            print(countKinetic.getN())
+            print(f'k = {countKinetic.getK()}')
+            print(f'r= {countKinetic.getR()}')
+            print(f'n = {countKinetic.getN()}')
 
             countDispersion = Dispertion(self.cList[0],self.tList,countKinetic.getN(),countKinetic.getK(),self.cList,self.n)
             
-            cbValues =countDispersion.countCbValues()
-            ccValues = countDispersion.countCcValues()
+            cbValues = [self.cb] + countDispersion.countCbValues()
+            #ccValues = [self.cc] + countDispersion.countCcValues()
             d = countDispersion.countDispertion()
             print(d)
 
-            #x1 = [1,2,3,4]
-            #y1 = [1,2,3,4]
-
-            #x2 = list(reversed(x1))
-            #y2 = y1
-
             self.canvas.axes.plot(self.tList,self.cList, color = 'g', label = 'Ca')
             self.canvas.axes.plot(self.tList,cbValues, color = 'r', label = 'Cb')
-            self.canvas.axes.plot(self.tList,ccValues, color = 'b', label = 'Cc')
+            #self.canvas.axes.plot(self.tList,ccValues, color = 'b', label = 'Cc')
             self.canvas.axes.legend()
             self.canvas.draw()
 
         
         except WrongCbValue as e:
-            #print(e.message)
             self.send_error(e.message)
             self.concSubstanceBLineEdit.setText('')
 
         except WrongCcValue as e:
-            #print(e.message)
             self.send_error(e.message)
             self.concSubstanceBLineEdit.setText('')
         
         except WrongTableValue as e:
-            #print(e.message)
             self.send_error(e.message)
-            self.dotsTable.setItem(e.row,e.col,QtWidgets.QTableWidgetItem(''))
+            self.dotsTable.setItem(e.row,e.col,QtWidgets.QtWidgets.QTableWidgetItem(''))
 
         except IsNotSortedInAsc as e:
-            #print(e.message)
             self.send_error(e.message)
             self.dotsTable.selectRow(e.position)
 
         except WrongNeighboringValues as e:
-            #print(e.message)
             self.send_error(e.message)
             self.dotsTable.selectRow(e.position)
 
         except TimeNegativeValue as e:
-            #print(e.message)
             self.send_error(e.message)
             self.dotsTable.selectRow(e.position)
 
         except ConcNegativeValue as e:
-            #print(e.message)
             self.send_error(e.message)
             self.dotsTable.selectRow(e.position)
 
