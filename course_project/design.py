@@ -203,7 +203,6 @@ class Ui_MainWindow(object):
             checkTimeList(self.tList)
             checkConcList(self.cList)
             
-            # это тестовый код для черчения
             countKinetic = KineticConst(self.cb,self.cc, self.cList, self.tList, self.n)
             countKinetic.countKineticParameters()
 
@@ -212,16 +211,16 @@ class Ui_MainWindow(object):
             print(f'r= {countKinetic.getR()}')
             print(f'n = {countKinetic.getN()}')
 
-            countDispersion = Dispertion(self.cList[0],self.tList,countKinetic.getN(),countKinetic.getK(),self.cList,self.n)
+            countDispersion = Dispertion(self.cList[0],self.tList,countKinetic.getN(),countKinetic.getK(),self.cList,self.n, self.cb, self.cc)
             
-            cbValues = [self.cb] + countDispersion.countCbValues()
-            #ccValues = [self.cc] + countDispersion.countCcValues()
+            countDispersion.countCValues()
             d = countDispersion.countDispertion()
             print(d)
 
-            self.canvas.axes.plot(self.tList,self.cList, color = 'g', label = 'Ca')
-            self.canvas.axes.plot(self.tList,cbValues, color = 'r', label = 'Cb')
-            #self.canvas.axes.plot(self.tList,ccValues, color = 'b', label = 'Cc')
+            self.canvas.axes.plot(self.tList,self.cList, color = 'g', label = 'Ca exp', marker = 'o')
+            self.canvas.axes.plot(self.tList,countDispersion.caValuesCounted, color = 'y', label = 'Ca counted', marker = 'o')
+            self.canvas.axes.plot(self.tList,countDispersion.cbValues, color = 'r', label = 'Cb', marker = 'o')
+            self.canvas.axes.plot(self.tList,countDispersion.ccValues, color = 'b', label = 'Cc', marker = 'o')
             self.canvas.axes.legend()
             self.canvas.draw()
 

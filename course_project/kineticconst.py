@@ -39,44 +39,37 @@ class KineticConst(object):
 
 
 class Dispertion(object):
-    def __init__(self,ca, listOfT,n,k, caValues, numOfValues):
+    def __init__(self,ca, listOfT,n,k,caValuesExp, numOfValues,cb,cc):
         self.ca = ca
+        self.cb = cb
+        self.cc = cc
         self.t = listOfT
         self.n = n
         self.k = k
-        self.caValues = caValues
+        self.caValuesExp = caValuesExp
+        self.caValuesCounted = [ca]
+        self.ccValues = [cc]
+        self.cbValues = [cb]
         self.numOfValues = numOfValues
 
-    def countCbValues(self):
+    def countCValues(self):
         ca = self.ca
-        cbValues = []
-        cb = 0
+        cb = self.cb
+        cc = self.cc
         for i in range(self.numOfValues-1):
             t = self.t[i+1] - self.t[i] 
-            cb = cb + self.k * 2 * (pow(ca,self.n)) * t
-            cbValues.append(cb)
-            ca = ca - self.k * 2 * (pow(ca,self.n)) * t
-            print("Значениея cb ", cb, "ca ", ca)
-        return cbValues
-
-
-    def countCcValues(self):
-        ca = self.ca
-        ccValues = []
-        cc = 0
-        for i in self.t:
-            cc = cc + self.k*pow(ca,self.n)
-            ccValues.append(cc)
-            ca = ca - self.k*2*pow(ca,self.n)
-        return ccValues
+            cb = cb + self.k * (pow(ca,self.n)) * t
+            cc = cc + self.k * (pow(ca,self.n)) * t * 2
+            self.cbValues.append(cb)
+            self.ccValues.append(cc)
+            ca = ca - self.k *  (pow(ca,self.n)) * t
+            self.caValuesCounted.append(ca)
+            #print(f'Значениея cb = {cb}, ca = {ca}, cc = {cc}')
     
     def countDispertion(self):
-        ca = self.ca
         d = 0
-        d += pow(ca - self.ca,2)
         for i in range(0, self.numOfValues):
-            ca = ca - self.k*2*pow(ca,self.n)
-            d += pow(ca - self.ca,2)
+            d += pow(self.caValuesExp[i] - self.caValuesCounted[i],2)
         return d
 
     
