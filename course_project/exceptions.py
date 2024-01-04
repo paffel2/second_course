@@ -37,6 +37,9 @@ class WrongValueException(Exception):
 class WrongCbValue(WrongValueException):
     pass
 
+class WrongCaValue(WrongValueException):
+    pass
+
 class WrongCcValue(WrongValueException):
     pass
 

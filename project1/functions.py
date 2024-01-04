@@ -18,9 +18,6 @@ def countPoints(start,end,step=0.1):
         listOfX.append(tmp[0])
         listOfY.append(tmp[1])
         start += step
-    #for i in range(0, len(listOfX) - 1):
-    #    print(listOfX[i],listOfY[i])
-    # код для проверки значений, так как в результате вычисления могут быть ошибки.
     return((listOfX,listOfY))
 
 # функция для проверки, что строка преобразуется в число

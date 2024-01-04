@@ -1,6 +1,7 @@
 from math import *
 from numpy import *
-
+from exceptions import WrongCaValue
+   
 class KineticConst(object):
     def __init__(self,cb,cc,listOfC, listOfT, numOfValues):
         self.ca = listOfC
@@ -32,7 +33,6 @@ class KineticConst(object):
             s4 += x*x
             s5 += x*y
             s6 += y*y
-        print(s1,s2,s3,s4,s5,s6)
         self._k = exp((s3*s4 - s2*s5)/(s1*s4 - s2*s2))
         self._n = (s1*s5 - s2*s3)/(s1*s4 - s2*s2)
         self._r = (s1*s5 - s2*s3)/sqrt((s1*s4 - s2*s2)*(s1*s6 - s3*s3))
@@ -57,14 +57,16 @@ class Dispertion(object):
         cb = self.cb
         cc = self.cc
         for i in range(self.numOfValues-1):
-            t = self.t[i+1] - self.t[i] 
-            cb = cb + self.k * (pow(ca,self.n)) * t
-            cc = cc + self.k * (pow(ca,self.n)) * t * 2
-            self.cbValues.append(cb)
-            self.ccValues.append(cc)
-            ca = ca - self.k *  (pow(ca,self.n)) * t
-            self.caValuesCounted.append(ca)
-            #print(f'Значениея cb = {cb}, ca = {ca}, cc = {cc}')
+            if ca < 0:
+                raise WrongCaValue("Модель невозможно описать линейной регрессией")
+            else:
+                t = self.t[i+1] - self.t[i] 
+                cb = cb + self.k * (pow(ca,self.n)) * t
+                cc = cc + self.k * (pow(ca,self.n)) * t * 2
+                self.cbValues.append(cb)
+                self.ccValues.append(cc)
+                ca = ca - self.k *  (pow(ca,self.n)) * t
+                self.caValuesCounted.append(ca)
     
     def countDispertion(self):
         d = 0

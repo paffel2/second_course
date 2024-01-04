@@ -182,6 +182,10 @@ class Ui_MainWindow(object):
     
     def countAction(self):
         try:
+            self.canvas_layout.removeWidget(self.canvas)
+            self.canvas = Canvas(self, xname = "Время (Т)", yname = "Концентрация (С)", title = "Экспериментальные точки и апроксимационная кривая")
+            self.canvas_layout.addWidget(self.canvas)
+            self.canvas.draw()
             self.readConCb()
             self.readConCc()
             self.readListRange()
@@ -198,37 +202,44 @@ class Ui_MainWindow(object):
                 self.cList.append(cTempValue)
 
 
-            print(f'listOfT = {self.tList}')
-            print(f'listOfC = {self.cList}')
             checkTimeList(self.tList)
             checkConcList(self.cList)
             
             countKinetic = KineticConst(self.cb,self.cc, self.cList, self.tList, self.n)
             countKinetic.countKineticParameters()
 
-            print("Кинетические параметры")
-            print(f'k = {countKinetic.getK()}')
-            print(f'r= {countKinetic.getR()}')
-            print(f'n = {countKinetic.getN()}')
-
             countDispersion = Dispertion(self.cList[0],self.tList,countKinetic.getN(),countKinetic.getK(),self.cList,self.n, self.cb, self.cc)
             
             countDispersion.countCValues()
             d = countDispersion.countDispertion()
-            print(d)
-
+            
             self.canvas.axes.plot(self.tList,self.cList, color = 'g', label = 'Ca exp', marker = 'o')
             self.canvas.axes.plot(self.tList,countDispersion.caValuesCounted, color = 'y', label = 'Ca counted', marker = 'o')
             self.canvas.axes.plot(self.tList,countDispersion.cbValues, color = 'r', label = 'Cb', marker = 'o')
             self.canvas.axes.plot(self.tList,countDispersion.ccValues, color = 'b', label = 'Cc', marker = 'o')
             self.canvas.axes.legend()
             self.canvas.draw()
+            msg_box = QtWidgets.QMessageBox()
+            msg_box.setIcon(QtWidgets.QMessageBox.Information)
+            msg_box.setText(f'Порядок реакции: {countKinetic.getN():.3f}\n'
+                            f'Константа скорости: {countKinetic.getK():.3f} с{chr(0x207B)}{chr(0x00B9)}\n'
+                            f'Коэффициент корелляции: {countKinetic.getR():.3f} \n'
+                            f'Дисперсия: {d:.3f} (моль\\л){chr(0x00B2)}')
+            msg_box.setWindowTitle("Результаты расчета")
+            msg_box.setStandardButtons(QtWidgets.QMessageBox.Ok)
+            msg_box.exec()
 
         
         except WrongCbValue as e:
             self.send_error(e.message)
             self.concSubstanceBLineEdit.setText('')
-
+        
+        except ValueError as e:
+            self.send_error("При расчете параметров возникла ошибка проверьте данные.")
+        
+        except WrongCaValue as e:
+            self.send_error(e.message)
+ 
         except WrongCcValue as e:
             self.send_error(e.message)
             self.concSubstanceBLineEdit.setText('')
