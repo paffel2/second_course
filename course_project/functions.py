@@ -1,5 +1,6 @@
 from exceptions import *
 
+
 def checkInt(x):
     try:
         int(x)
@@ -7,24 +8,27 @@ def checkInt(x):
     except ValueError:
         return False
 
-def toFloat(x,message,ex):
+
+def toFloat(x, message, ex):
     try:
         a = float(x)
-        return(a)
+        return a
     except ValueError:
         raise ex(message)
 
-def toInt(x,message):
+
+def toInt(x, message):
     try:
         a = int(x)
-        return(a)
+        return a
     except ValueError:
         raise WrongValueException(message)
-    
-def toFloatList(lst,n,message):
+
+
+def toFloatList(lst, n, message):
     temp = []
     try:
-        for i in range(0,n):
+        for i in range(0, n):
             a = float(lst[i])
             temp.append(a)
         return temp
@@ -35,33 +39,54 @@ def toFloatList(lst,n,message):
         raise WrongValueException("неверный размер списка")
 
 
-def checkTimeList(lst): 
+def checkTimeList(lst):
     tempValue = lst[0]
     if tempValue < 0:
-        raise TimeNegativeValue("Список временных точек содержит отрицательное значение. Позиция 1", 0)
-    for i in range(1,len(lst)):
-            if tempValue < lst[i]:
-                tempValue = lst[i]
-            else:
-                raise IsNotSortedInAsc("Список временных точек не отсортирован по возрастанию. Позиция " + str(i+1), i)
-            if lst[i] < 0:
-                raise TimeNegativeValue("Список временных точек содержит отрицательное значение. Позиция " + str(i+1), i)
+        raise TimeNegativeValue(
+            "Список временных точек содержит отрицательное значение. Позиция 1", 0
+        )
+    for i in range(1, len(lst)):
+        if tempValue < lst[i]:
+            tempValue = lst[i]
+        else:
+            raise IsNotSortedInAsc(
+                "Список временных точек не отсортирован по возрастанию. Позиция "
+                + str(i + 1),
+                i,
+            )
+        if lst[i] < 0:
+            raise TimeNegativeValue(
+                "Список временных точек содержит отрицательное значение. Позиция "
+                + str(i + 1),
+                i,
+            )
+
 
 def checkConcList(lst):
     tempValue = lst[0]
     if tempValue < 0:
-        raise ConcNegativeValue("В списке концентраций содержится отрицательное значение. Позиция 1", 0)
-    for i in range(1,len(lst)):
+        raise ConcNegativeValue(
+            "В списке концентраций содержится отрицательное значение. Позиция 1", 0
+        )
+    for i in range(1, len(lst)):
         if tempValue != lst[i]:
             tempValue = lst[i]
         else:
-            raise WrongNeighboringValues("В списке концентраций имеются одинаковые рядом стоящие значения. Позиция " + str(i+1), i)
+            raise WrongNeighboringValues(
+                "В списке концентраций имеются одинаковые рядом стоящие значения. Позиция "
+                + str(i + 1),
+                i,
+            )
         if lst[i] < 0:
-            raise ConcNegativeValue("В списке концентраций содержится отрицательное значение. Позиция " + str(i+1), i)
-            
+            raise ConcNegativeValue(
+                "В списке концентраций содержится отрицательное значение. Позиция "
+                + str(i + 1),
+                i,
+            )
 
-def toFloatTableValue(v,message,row,col):
+
+def toFloatTableValue(v, message, row, col):
     try:
         return float(v)
     except ValueError:
-        raise WrongTableValue(message,row,col)
+        raise WrongTableValue(message, row, col)
