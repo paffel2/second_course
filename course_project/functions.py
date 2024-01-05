@@ -40,47 +40,37 @@ def toFloatList(lst, n, message):
 
 
 def checkTimeList(lst):
-    tempValue = lst[0]
-    if tempValue < 0:
+    if lst[0] < 0:
         raise TimeNegativeValue(
             "Список временных точек содержит отрицательное значение. Позиция 1", 0
         )
     for i in range(1, len(lst)):
-        if tempValue < lst[i]:
-            tempValue = lst[i]
-        else:
+        if lst[i] < lst[i - 1]:
             raise IsNotSortedInAsc(
-                "Список временных точек не отсортирован по возрастанию. Позиция "
-                + str(i + 1),
+                f"Список временных точек не отсортирован по возрастанию. Позиция {i + 1}",
                 i,
             )
         if lst[i] < 0:
             raise TimeNegativeValue(
-                "Список временных точек содержит отрицательное значение. Позиция "
-                + str(i + 1),
+                f"Список временных точек содержит отрицательное значение. Позиция {i+1}",
                 i,
             )
 
 
 def checkConcList(lst):
-    tempValue = lst[0]
-    if tempValue < 0:
+    if lst[0] < 0:
         raise ConcNegativeValue(
             "В списке концентраций содержится отрицательное значение. Позиция 1", 0
         )
     for i in range(1, len(lst)):
-        if tempValue != lst[i]:
-            tempValue = lst[i]
-        else:
+        if lst[i - 1] == lst[i]:
             raise WrongNeighboringValues(
-                "В списке концентраций имеются одинаковые рядом стоящие значения. Позиция "
-                + str(i + 1),
+                f"В списке концентраций имеются одинаковые рядом стоящие значения. Позиция {i+1}",
                 i,
             )
         if lst[i] < 0:
             raise ConcNegativeValue(
-                "В списке концентраций содержится отрицательное значение. Позиция "
-                + str(i + 1),
+                f"В списке концентраций содержится отрицательное значение. Позиция {i+1}",
                 i,
             )
 

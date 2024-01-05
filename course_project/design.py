@@ -80,7 +80,7 @@ class Ui_MainWindow(object):
         self.dotsTable.setColumnCount(2)
         self.dotsTable.setObjectName("dotsTable")
         self.dotsTable.horizontalHeader().setVisible(True)
-        self.dotsTable.setHorizontalHeaderLabels(["C", "t"])
+        self.dotsTable.setHorizontalHeaderLabels(["Ca, моль/л", "t, c"])
         self.inputLayout.addWidget(self.dotsTable)
         self.buttonsLayout = QtWidgets.QHBoxLayout()
         self.buttonsLayout.setSpacing(20)
@@ -94,12 +94,7 @@ class Ui_MainWindow(object):
         self.inputLayout.addLayout(self.buttonsLayout)
 
         # заполнение виджета с графиком
-        self.canvas = Canvas(
-            self,
-            xname="Время (Т)",
-            yname="Концентрация (С)",
-            title="Экспериментальные точки и апроксимационная кривая",
-        )
+        self.canvas = self.createCanvas()
         self.canvas_layout = QtWidgets.QVBoxLayout()
         self.canvas_layout.addWidget(self.canvas)
         self.frameForGraphicWidget = QtWidgets.QWidget(self.centralwidget)
@@ -149,7 +144,7 @@ class Ui_MainWindow(object):
             QtWidgets.QHeaderView.Stretch
         )
         self.resultTableWidget.setHorizontalHeaderLabels(
-            ["t", "Ca Exp", "Ca", "Cb", "Cc"]
+            ["t, c", "Ca Эксп, моль/л", "Ca, моль/л", "Cb, моль/л", "Cc, моль/л"]
         )
         self.resultTableWidget.setVisible(False)
 
@@ -163,8 +158,12 @@ class Ui_MainWindow(object):
             _translate("MainWindow", "Оценка кинетических констант")
         )
         self.inputDataFrame.setTitle(_translate("MainWindow", "Ввод данных"))
-        self.concSubstanceBLabel.setText(_translate("MainWindow", "Консентрация Cb"))
-        self.concSubstanceCLabel.setText(_translate("MainWindow", "Концентрация Cc"))
+        self.concSubstanceBLabel.setText(
+            _translate("MainWindow", "Консентрация Cb, моль/л")
+        )
+        self.concSubstanceCLabel.setText(
+            _translate("MainWindow", "Концентрация Cc, моль/л")
+        )
         self.numOfDotsLabel.setText(_translate("MainWindow", "Количество точек"))
         self.countButton.setText(_translate("MainWindow", "Вычислить"))
         self.resetButton.setText(_translate("MainWindow", "Очистить"))
@@ -172,6 +171,14 @@ class Ui_MainWindow(object):
     def changeNumOfRows(self):
         n = self.numOfDotsSpinBox.text()
         self.dotsTable.setRowCount(int(n))
+
+    def createCanvas(self):
+        return Canvas(
+            self,
+            xname="Время (c)",
+            yname="Концентрация (моль/л)",
+            title="Экспериментальные точки и апроксимационная кривая",
+        )
 
     def resetAction(self):
         self.concSubstanceBLineEdit.setText("")
@@ -181,12 +188,7 @@ class Ui_MainWindow(object):
         self.numOfDotsSpinBox.setValue(2)
         self.canvas.axes.clear()
         self.canvas_layout.removeWidget(self.canvas)
-        self.canvas = Canvas(
-            self,
-            xname="Время (Т)",
-            yname="Концентрация (С)",
-            title="Экспериментальные точки и апроксимационная кривая",
-        )
+        self.canvas = self.createCanvas()
         self.canvas_layout.addWidget(self.canvas)
         self.canvas.draw()
         self.resultTableWidget.setRowCount(0)
@@ -203,12 +205,7 @@ class Ui_MainWindow(object):
     def countAction(self):
         try:
             self.canvas_layout.removeWidget(self.canvas)
-            self.canvas = Canvas(
-                self,
-                xname="Время (Т)",
-                yname="Концентрация (С)",
-                title="Экспериментальные точки и апроксимационная кривая",
-            )
+            self.canvas = self.createCanvas()
             self.canvas_layout.addWidget(self.canvas)
             self.canvas.draw()
             self.readConCb()
@@ -235,42 +232,43 @@ class Ui_MainWindow(object):
             checkTimeList(self.tList)
             checkConcList(self.cList)
 
-            countKinetic = KineticConst(
+            kineticConstObj = KineticConst(
                 self.cb, self.cc, self.cList, self.tList, self.n
             )
-            countKinetic.countKineticParameters()
+            kineticConstObj.countKineticParameters()
 
-            countDispersion = Dispertion(
+            dispertionObj = Dispertion(
                 self.cList[0],
                 self.tList,
-                countKinetic.getN(),
-                countKinetic.getK(),
+                kineticConstObj.n,
+                kineticConstObj.k,
                 self.cList,
                 self.n,
                 self.cb,
                 self.cc,
             )
 
-            countDispersion.countCValues()
-            d = countDispersion.countDispertion()
+            dispertionObj.countCValues()
+            d = dispertionObj.countDispertion()
 
             self.canvas.axes.plot(
-                self.tList, self.cList, color="g", label="Ca exp", marker="o"
+                self.tList, self.cList, color="g", label="Ca Эксп", marker="o"
             )
             self.canvas.axes.plot(
                 self.tList,
-                countDispersion.caValuesCounted,
+                dispertionObj.caValuesCounted,
                 color="y",
-                label="Ca counted",
+                label="Ca теор.",
                 marker="o",
             )
             self.canvas.axes.plot(
-                self.tList, countDispersion.cbValues, color="r", label="Cb", marker="o"
+                self.tList, dispertionObj.cbValues, color="r", label="Cb", marker="o"
             )
             self.canvas.axes.plot(
-                self.tList, countDispersion.ccValues, color="b", label="Cc", marker="o"
+                self.tList, dispertionObj.ccValues, color="b", label="Cc", marker="o"
             )
             self.canvas.axes.legend()
+            self.canvas.axes.grid(True)
             self.canvas.draw()
 
             self.resultTableWidget.setRowCount(self.n)
@@ -286,30 +284,30 @@ class Ui_MainWindow(object):
                     i,
                     2,
                     QtWidgets.QTableWidgetItem(
-                        str(round(countDispersion.caValuesCounted[i], 2))
+                        str(round(dispertionObj.caValuesCounted[i], 2))
                     ),
                 )
                 self.resultTableWidget.setItem(
                     i,
                     3,
                     QtWidgets.QTableWidgetItem(
-                        str(round(countDispersion.cbValues[i], 2))
+                        str(round(dispertionObj.cbValues[i], 2))
                     ),
                 )
                 self.resultTableWidget.setItem(
                     i,
                     4,
                     QtWidgets.QTableWidgetItem(
-                        str(round(countDispersion.ccValues[i], 2))
+                        str(round(dispertionObj.ccValues[i], 2))
                     ),
                 )
 
             msg_box = QtWidgets.QMessageBox()
             msg_box.setIcon(QtWidgets.QMessageBox.Information)
             msg_box.setText(
-                f"Порядок реакции: {countKinetic.getN():.3f}\n"
-                f"Константа скорости: {countKinetic.getK():.3f} с{chr(0x207B)}{chr(0x00B9)}\n"
-                f"Коэффициент корелляции: {countKinetic.getR():.3f} \n"
+                f"Порядок реакции: {kineticConstObj.n:.3f}\n"
+                f"Константа скорости: {kineticConstObj.k:.3f} с{chr(0x207B)}{chr(0x00B9)}\n"
+                f"Коэффициент корелляции: {kineticConstObj.r:.3f} \n"
                 f"Дисперсия: {d:.3f} (моль\\л){chr(0x00B2)}"
             )
             msg_box.setWindowTitle("Результаты расчета")

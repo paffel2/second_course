@@ -9,19 +9,10 @@ class KineticConst(object):
         self.t = listOfT
         self.cb = cb
         self.cc = cc
-        self._n = 0
-        self._r = 0
-        self._k = 0
+        self.n = 0
+        self.r = 0
+        self.k = 0
         self.numOfValues = numOfValues
-
-    def getK(self):
-        return self._k
-
-    def getN(self):
-        return self._n
-
-    def getR(self):
-        return self._r
 
     def countKineticParameters(self):
         s1 = self.numOfValues - 1
@@ -34,9 +25,9 @@ class KineticConst(object):
             s4 += x * x
             s5 += x * y
             s6 += y * y
-        self._k = exp((s3 * s4 - s2 * s5) / (s1 * s4 - s2 * s2))
-        self._n = (s1 * s5 - s2 * s3) / (s1 * s4 - s2 * s2)
-        self._r = (s1 * s5 - s2 * s3) / sqrt((s1 * s4 - s2 * s2) * (s1 * s6 - s3 * s3))
+        self.k = exp((s3 * s4 - s2 * s5) / (s1 * s4 - s2 * s2))
+        self.n = (s1 * s5 - s2 * s3) / (s1 * s4 - s2 * s2)
+        self.r = (s1 * s5 - s2 * s3) / sqrt((s1 * s4 - s2 * s2) * (s1 * s6 - s3 * s3))
 
 
 class Dispertion(object):
