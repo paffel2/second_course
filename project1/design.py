@@ -3,14 +3,16 @@ from functions import *
 from matplotlib.backends.backend_qtagg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.figure import Figure
 
+
 # Класс для отрисовки графика
 class Canvas(FigureCanvas):
-    def __init__(self, parent=None, xs = [],ys=[]):
+    def __init__(self, parent=None, xs=[], ys=[]):
         fig = Figure()
         self.axes = fig.add_subplot(111)
         super(Canvas, self).__init__(fig)
 
-#класс для окна приложения
+
+# класс для окна приложения
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
@@ -18,7 +20,7 @@ class Ui_MainWindow(object):
         self.centralwidget = QtWidgets.QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
 
-        #заполнение виджета с графиком
+        # заполнение виджета с графиком
         self.canvas = Canvas(self)
         self.canvas_layout = QtWidgets.QVBoxLayout()
         self.canvas_layout.addWidget(self.canvas)
@@ -29,10 +31,10 @@ class Ui_MainWindow(object):
         self.plotWidget.setLayout(self.canvas_layout)
 
         self.imageLabel = QtWidgets.QLabel(self.centralwidget)
-        self.pix = QtGui.QPixmap('img.png')
+        self.pix = QtGui.QPixmap("./project1/img.png")
         self.imageLabel.setGeometry(QtCore.QRect(35, 360, 225, 93))
         self.imageLabel.setPixmap(self.pix)
-        
+
         self.widget1 = QtWidgets.QWidget(self.centralwidget)
         self.widget1.setGeometry(QtCore.QRect(12, 32, 271, 171))
         self.widget1.setObjectName("widget1")
@@ -43,7 +45,7 @@ class Ui_MainWindow(object):
 
         self.gridLayout = QtWidgets.QGridLayout()
         self.gridLayout.setObjectName("gridLayout")
-        #поле для значения верхней границы
+        # поле для значения верхней границы
         self.high_border_label = QtWidgets.QLabel(self.widget1)
         self.high_border_label.setObjectName("high_border_label")
         self.gridLayout.addWidget(self.high_border_label, 0, 0, 1, 1)
@@ -51,7 +53,7 @@ class Ui_MainWindow(object):
         self.high_border_input_line.setObjectName("high_border_input_line")
         self.gridLayout.addWidget(self.high_border_input_line, 0, 1, 1, 1)
 
-        #поле для значения нижней границы
+        # поле для значения нижней границы
         self.low_border_label = QtWidgets.QLabel(self.widget1)
         self.low_border_label.setObjectName("low_border_label")
         self.gridLayout.addWidget(self.low_border_label, 1, 0, 1, 1)
@@ -65,7 +67,7 @@ class Ui_MainWindow(object):
         self.gridLayout.addWidget(self.step_label, 2, 0, 1, 1)
         self.step_input_line = QtWidgets.QLineEdit(self.widget1)
         self.step_input_line.setEnabled(True)
-        self.step_input_line.setText('0.1')
+        self.step_input_line.setText("0.1")
         self.step_input_line.setObjectName("step_input_line")
         self.gridLayout.addWidget(self.step_input_line, 2, 1, 1, 1)
 
@@ -92,7 +94,6 @@ class Ui_MainWindow(object):
 
         self.retranslateUi(MainWindow)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
-     
 
         # связь кнопок с действиями
         self.count_button.clicked.connect(self.count_click)
@@ -100,37 +101,39 @@ class Ui_MainWindow(object):
 
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
-        MainWindow.setWindowTitle(_translate("MainWindow", "Построение графика функции"))
+        MainWindow.setWindowTitle(
+            _translate("MainWindow", "Построение графика функции")
+        )
         self.high_border_label.setText(_translate("MainWindow", "Верхняя граница"))
         self.low_border_label.setText(_translate("MainWindow", "Нижняя граница"))
         self.step_label.setText(_translate("MainWindow", "Шаг вычисления"))
         self.count_button.setText(_translate("MainWindow", "Вычисление"))
         self.reset_button.setText(_translate("MainWindow", "Повторить"))
-        
+
     # функция для отправки окна с ошибкой
-    def send_error(self,message):
-            msg_box = QtWidgets.QMessageBox()
-            msg_box.setIcon(QtWidgets.QMessageBox.Warning)
-            msg_box.setText(message)
-            msg_box.setWindowTitle("Ошибка")
-            msg_box.setStandardButtons(QtWidgets.QMessageBox.Ok)
-            return_value = msg_box.exec()
-            if return_value == QtWidgets.QMessageBox.Ok:
-                self.high_border_input_line.setText('')
-                self.low_border_input_line.setText('')
-                self.step_input_line.setText('0.1')
+    def send_error(self, message):
+        msg_box = QtWidgets.QMessageBox()
+        msg_box.setIcon(QtWidgets.QMessageBox.Warning)
+        msg_box.setText(message)
+        msg_box.setWindowTitle("Ошибка")
+        msg_box.setStandardButtons(QtWidgets.QMessageBox.Ok)
+        return_value = msg_box.exec()
+        if return_value == QtWidgets.QMessageBox.Ok:
+            self.high_border_input_line.setText("")
+            self.low_border_input_line.setText("")
+            self.step_input_line.setText("0.1")
 
     # действие для рассчета и черчения графика
     def count_click(self):
-        x_n = self.high_border_input_line.text() 
+        x_n = self.high_border_input_line.text()
         x_0 = self.low_border_input_line.text()
         x_step = self.step_input_line.text()
         if not checkFloat(x_n):
-            self.send_error('Неверно задана верхняя граница')
+            self.send_error("Неверно задана верхняя граница")
         elif not checkFloat(x_0):
-            self.send_error('Неверно задана нижняя граница')
+            self.send_error("Неверно задана нижняя граница")
         elif not checkFloat(x_step):
-            self.send_error('Неверно задан шаг вычисления')
+            self.send_error("Неверно задан шаг вычисления")
         else:
             x_n = float(x_n)
             x_0 = float(x_0)
@@ -138,19 +141,19 @@ class Ui_MainWindow(object):
             self.high_border_input_line.setEnabled(False)
             self.low_border_input_line.setEnabled(False)
             self.step_input_line.setEnabled(False)
-            (x,y) = countPoints(x_0,x_n,x_step)
-            self.canvas.axes.plot(x,y, color = 'g')
+            (x, y) = countPoints(x_0, x_n, x_step)
+            self.canvas.axes.plot(x, y, color="g")
             self.canvas.draw()
             self.count_button.setEnabled(False)
             self.reset_button.setEnabled(True)
-    
+
     # очистка полей перед повторным рассчетом
     def reset_click(self):
-        self.high_border_input_line.setText('')
+        self.high_border_input_line.setText("")
         self.high_border_input_line.setEnabled(True)
-        self.low_border_input_line.setText('')
+        self.low_border_input_line.setText("")
         self.low_border_input_line.setEnabled(True)
-        self.step_input_line.setText('0.1')
+        self.step_input_line.setText("0.1")
         self.step_input_line.setEnabled(True)
         self.canvas.axes.clear()
         self.canvas.draw()
